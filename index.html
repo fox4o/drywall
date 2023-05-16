@@ -4,8 +4,11 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
+    <title>Drywall Draw</title>
     <style>
+      .hidden {
+        display: none;
+      }
       #wrapper {
         position: relative;
         border: 1px solid #9c9898;
@@ -38,12 +41,140 @@
       canvas {
         position: absolute;
       }
+      td input {
+        text-align: right;
+      }
     </style>
     <script src="script.js"></script>
   </head>
   <body onmousedown="return false;">
-    <center>drawJS Test</center>
-    <div id="wrapper" style="width: 100%; height: 100%">
+    <h1><center>Drywall calculator</center></h1>
+    <table style="width: 100%" id="form">
+      <tr>
+        <td colspan="2" style="text-align: center; background-color: aqua">
+          <h3>Размери на стаята в СМ</h3>
+        </td>
+      </tr>
+      <tr>
+        <td style="text-align: right">
+          <input type="text" name="l" value="100" /> cm
+        </td>
+        <td>Дължина</td>
+      </tr>
+      <tr>
+        <td style="text-align: right">
+          <input type="text" name="h" value="100" /> cm
+        </td>
+        <td>Ширина</td>
+      </tr>
+      <tr>
+        <td colspan="2" style="text-align: center; background-color: aqua">
+          <h3>Носач</h3>
+        </td>
+      </tr>
+      <tr>
+        <td style="text-align: right">
+          <input type="text" name="fls" value="25" /> cm
+        </td>
+        <td>Отъместване от стената</td>
+      </tr>
+      <tr>
+        <td style="text-align: right">
+          <input type="text" name="s" value="70" /> cm
+        </td>
+        <td>Разстояние м/у носачите</td>
+      </tr>
+      <tr>
+        <td colspan="2" style="text-align: center; background-color: aqua">
+          <h3>Носещ профил</h3>
+        </td>
+      </tr>
+      <tr>
+        <td style="text-align: right">
+          <input type="text" name="mfls" value="25" /> cm
+        </td>
+        <td>Отъместване от стената</td>
+      </tr>
+      <tr>
+        <td style="text-align: right">
+          <input type="text" name="ms" value="70" /> cm
+        </td>
+        <td>Разстояние м/у профилите</td>
+      </tr>
+      <tr>
+        <td colspan="2" style="text-align: center; background-color: aqua">
+          <h3>Монтажен профил</h3>
+        </td>
+      </tr>
+      <tr>
+        <td style="text-align: right">
+          <input type="text" name="bfls" value="10" /> cm
+        </td>
+        <td>Отъместване от стената</td>
+      </tr>
+      <tr>
+        <td style="text-align: right">
+          <input type="text" name="bs" value="50" /> cm
+        </td>
+        <td>Разстояние м/у профилите</td>
+      </tr>
+      <tr>
+        <td colspan="2" style="text-align: center; background-color: aqua">
+          <h3>Гипскартон</h3>
+        </td>
+      </tr>
+      <tr>
+        <td style="text-align: right">
+          <input type="text" name="mindwfls" value="30" /> cm
+        </td>
+        <td>минимална ширина на парче</td>
+      </tr>
+      <tr>
+        <td style="text-align: right">
+          <input type="text" name="dwfs" value="50" /> cm
+        </td>
+        <td>отместване на съседното парче</td>
+      </tr>
+      <tr>
+        <td colspan="2" style="text-align: center; background-color: aqua">
+          <h3>Материали</h3>
+        </td>
+      </tr>
+      <tr>
+        <td style="text-align: right">
+          <input type="text" name="cdl" value="300" /> cm
+        </td>
+        <td>Дължина на CD профил</td>
+      </tr>
+      <tr>
+        <td style="text-align: right">
+          <input type="text" name="udl" value="300" /> cm
+        </td>
+        <td>Дължина на UD профил</td>
+      </tr>
+      <tr>
+        <td style="text-align: right">
+          <input type="text" name="dwl" value="200" /> cm
+        </td>
+        <td>Дължина на плоскост</td>
+      </tr>
+      <tr>
+        <td style="text-align: right">
+          <input type="text" name="dwh" value="120" /> cm
+        </td>
+        <td>Ширина на плоскост</td>
+      </tr>
+
+      <tr>
+        <td>&nbsp;</td>
+      </tr>
+      <tr>
+        <td colspan="2" style="text-align: center">
+          <button id="draw"><h4>Чертай</h4></button>
+        </td>
+      </tr>
+    </table>
+    <div id="wrapper" style="width: 100%; height: 100%" class="hidden">
       <div id="buttonWrapper">
         <input type="button" id="plus" value="+" />
         <input type="button" id="minus" value="-" />
@@ -55,6 +186,51 @@
         // clear layers before draw
         drawJS.clearLayers();
 
+        // за носач
+        //fls = 25;//отместване от стената
+        //s = 70;//разстояние между носачите
+        b = Math.floor((l - 2 * fls) / s) + 2; //брой носачи на ред
+
+        // за носещ профил
+        //mfls = 25;//отместване от стената
+        //ms = 70;//разстояние между носещите профили
+        mp = Math.ceil((h - 2 * mfls) / ms - 1) + 2; //брой редове с носещи профили
+
+        // носачи
+        bmp = b * mp;
+        calcData.bmp= bmp + " броя носача";
+
+        // за монтажен профил
+        //bfls = 10;//отместване от стената
+        //bs = 50;//разстояние между монтажните профили
+        bp = Math.floor(l / bs) + 2; //брой редове с монтажни профили
+        if (l % bs == 0) {
+          bp--;
+        }
+
+        // котви
+        mpbp = mp * bp;
+        calcData.mpbp= mpbp + " броя скраб/котва";
+
+        // за гипскартона
+        //mindwfls = 30;//минимална ширина на парче
+        //dwfs = 50;//отместване на съседното парче
+
+        //udn - брой ud профили
+        udn = Math.ceil((2 * (l + h)) / udl);
+        calcData.ud= udn + " броя по " + udl + "см";
+
+        //cdn - брой cd профили
+        cdn = Math.ceil((mp * l + bp * h) / cdl);
+        calcData.cd= cdn + " броя по " + cdl + "см";
+
+        // dw - брой плоскости
+        dwn = Math.ceil((l * h) / (dwl * dwh));
+        calcData.dw= dwn + " броя плоскости " + dwl + "x" + dwh + "см";
+
+        console.log(calcData);
+
+        /*
         drawJS.drawRect({
           cx: 100,
           cy: 100,
@@ -64,25 +240,11 @@
           lineWidth: 5,
           strokeStyle: "red",
         });
-        drawJS.drawRect({
-          cx: 100,
-          cy: 100,
-          width: 50,
-          height: 100,
-          layer: "back",
-        });
-        drawJS.drawCircle({
-          radius: 50,
-          cx: 150,
-          cy: 150,
-          stroke: "#622569",
-          lineWidth: 5,
-          fill: "#98d1d6",
-          layer: "back",
-        });
+        */
       }
 
       window.onload = function () {
+        calcData = {};
         var wrapper = drawJS.addStage({
           wrapper: "#wrapper",
         });
@@ -91,6 +253,45 @@
 
         var startDragOffset = {};
         var mouseDown = false;
+
+        document.getElementById("draw").addEventListener(
+          "click",
+          () => {
+            // parameters
+            l = parseInt(document.querySelector("input[name=l]").value);
+            h = parseInt(document.querySelector("input[name=h]").value);
+            fls = parseInt(document.querySelector("input[name=fls]").value);
+            s = parseInt(document.querySelector("input[name=s]").value);
+            mfls = parseInt(
+              document.querySelector("input[name=mfls]").value
+            );
+            ms = parseInt(document.querySelector("input[name=ms]").value);
+            bfls = parseInt(
+              document.querySelector("input[name=bfls]").value
+            );
+            bs = parseInt(document.querySelector("input[name=bs]").value);
+            mindwfls = parseInt(
+              document.querySelector("input[name=mindwfls]").value
+            );
+            dwfs = parseInt(
+              document.querySelector("input[name=dwfs]").value
+            );
+            cdl = parseInt(document.querySelector("input[name=cdl]").value);
+            udl = parseInt(document.querySelector("input[name=udl]").value);
+            dwl = parseInt(document.querySelector("input[name=dwl]").value);
+            dwh = parseInt(document.querySelector("input[name=dwh]").value);
+
+            if (l < 100 || h < 100 || isNaN(l) || isNaN(h)) {
+              alert("Липсват параметри!");
+            } else {
+              document.getElementById("wrapper").classList.remove("hidden");
+              document.getElementById("form").classList.add("hidden");
+
+              draw();
+            }
+          },
+          false
+        );
 
         document.getElementById("plus").addEventListener(
           "click",
@@ -135,8 +336,6 @@
             draw();
           }
         });
-
-        draw();
       };
     </script>
   </body>
