@@ -33,21 +33,22 @@
 
       div.stage {
         position: relative;
+        border: 1px solid #9c9898;
         margin: 0px auto;
-        border: 1px solid #000;
         width: 100%;
         height: 100%;
       }
       canvas {
         position: absolute;
       }
-      td input {
+      input[type="text"] {
+        width:75px;
         text-align: right;
       }
     </style>
     <script src="script.js"></script>
   </head>
-  <body onmousedown="return false;">
+  <body>
     <h1><center>Drywall calculator</center></h1>
     <table style="width: 100%" id="form">
       <tr>
@@ -174,7 +175,7 @@
         </td>
       </tr>
     </table>
-    <div id="wrapper" style="width: 100%; height: 100%" class="hidden">
+    <div id="wrapper" style="width: 100%; height: 100%">
       <div id="buttonWrapper">
         <input type="button" id="plus" value="+" />
         <input type="button" id="minus" value="-" />
@@ -198,7 +199,7 @@
 
         // носачи
         bmp = b * mp;
-        calcData.bmp= bmp + " броя носача";
+        calcData.bmp = bmp + " броя носача";
 
         // за монтажен профил
         //bfls = 10;//отместване от стената
@@ -210,7 +211,7 @@
 
         // котви
         mpbp = mp * bp;
-        calcData.mpbp= mpbp + " броя скраб/котва";
+        calcData.mpbp = mpbp + " броя скраб/котва";
 
         // за гипскартона
         //mindwfls = 30;//минимална ширина на парче
@@ -218,18 +219,167 @@
 
         //udn - брой ud профили
         udn = Math.ceil((2 * (l + h)) / udl);
-        calcData.ud= udn + " броя по " + udl + "см";
+        calcData.ud = udn + " броя по " + udl + "см";
 
         //cdn - брой cd профили
         cdn = Math.ceil((mp * l + bp * h) / cdl);
-        calcData.cd= cdn + " броя по " + cdl + "см";
+        calcData.cd = cdn + " броя по " + cdl + "см";
 
         // dw - брой плоскости
         dwn = Math.ceil((l * h) / (dwl * dwh));
-        calcData.dw= dwn + " броя плоскости " + dwl + "x" + dwh + "см";
+        calcData.dw = dwn + " броя плоскости " + dwl + "x" + dwh + "см";
 
         console.log(calcData);
 
+        // drywall
+        {
+          dwr = Math.floor(h / dwh);
+          dwc = Math.floor(l / dwl);
+          dwfls = Math.floor((h - dwr * dwh) / 2);
+          if (dwfls < mindwfls && dwfls > 0) {
+            dwr--;
+            dwfls = (h - dwr * dwh) / 2;
+          }
+          xs = dwfs;
+          // горни парчета
+          {
+            // 1
+            drawJS.drawRect({
+              strokeStyle: "#ff0000",
+              strokeWidth: 1,
+              fillStyle: "#ffffff",
+              cx: xs / 2,
+              cy: dwfls / 2,
+              width: xs,
+              height: dwfls,
+              layer: "dw",
+            });
+            //next
+            dwflc = Math.floor((l - xs) / dwl);
+            for (i = 0; i < dwflc; i++) {
+              drawJS.drawRect({
+                strokeStyle: "#ff0000",
+                strokeWidth: 1,
+                fillStyle: "#ffffff",
+                cx: xs + i * dwl + dwl / 2,
+                cy: dwfls / 2,
+                width: dwl,
+                height: dwfls,
+                layer: "dw",
+              });
+            }
+            //last
+            drawJS.drawRect({
+              strokeStyle: "#ff0000",
+              strokeWidth: 1,
+              fillStyle: "#ffffff",
+              cx: xs + dwflc * dwl + (l - (xs + dwflc * dwl)) / 2,
+              cy: dwfls / 2,
+              width: l - (xs + dwflc * dwl),
+              height: dwfls,
+              layer: "dw",
+            });
+          }
+          // долни парчета
+          {
+            if (dwr % 2 == 0) {
+              xs = 0;
+            }
+            // 1
+            drawJS.drawRect({
+              strokeStyle: "#ff0000",
+              strokeWidth: 1,
+              fillStyle: "#ffffff",
+              cx: xs / 2,
+              cy: h - dwfls / 2,
+              width: xs,
+              height: dwfls,
+              layer: "dw",
+            });
+            //next
+            dwflc = Math.floor((l - xs) / dwl);
+            for (i = 0; i < dwflc; i++) {
+              drawJS.drawRect({
+                strokeStyle: "#ff0000",
+                strokeWidth: 1,
+                fillStyle: "#ffffff",
+                cx: xs + i * dwl + dwl / 2,
+                cy: h - dwfls / 2,
+                width: dwl,
+                height: dwfls,
+                layer: "dw",
+              });
+            }
+            //last
+            drawJS.drawRect({
+              strokeStyle: "#ff0000",
+              strokeWidth: 1,
+              fillStyle: "#ffffff",
+              cx: xs + dwflc * dwl + (l - (xs + dwflc * dwl)) / 2,
+              cy: h - dwfls / 2,
+              width: l - (xs + dwflc * dwl),
+              height: dwfls,
+              layer: "dw",
+            });
+          }
+
+          // вътрешни парчета
+          for (i = 0; i < dwr; i++) {
+            //50см отместване
+            i % 2 ? (xs = dwfs) : (xs = 0);
+            //чертае първото парче за отместване
+            if (xs > 0) {
+              drawJS.drawRect({
+                strokeStyle: "#ff0000",
+                strokeWidth: 1,
+                fillStyle: "#ffffff",
+                cx: xs / 2,
+                cy: dwfls + dwh / 2 + i * dwh,
+                width: xs,
+                height: dwh,
+                layer: "dw",
+              });
+            }
+            for (j = 0; j < dwc; j++) {
+              if (dwl / 2 + j * dwl + xs + dwl / 2 <= l) {
+                drawJS.drawRect({
+                  strokeStyle: "#ff0000",
+                  strokeWidth: 1,
+                  fillStyle: "#ffffff",
+                  cx: dwl / 2 + j * dwl + xs,
+                  cy: dwfls + dwh / 2 + i * dwh,
+                  width: dwl,
+                  height: dwh,
+                  layer: "dw",
+                });
+              }
+            }
+            // чертае последното парче
+            if (dwc * dwl + xs < l) {
+              drawJS.drawRect({
+                strokeStyle: "#ff0000",
+                strokeWidth: 1,
+                fillStyle: "#ffffff",
+                cx: dwc * dwl + xs + (l - (dwc * dwl + xs)) / 2,
+                cy: dwfls + dwh / 2 + i * dwh,
+                width: l - (dwc * dwl + xs),
+                height: dwh,
+                layer: "dw",
+              });
+            } else {
+              drawJS.drawRect({
+                strokeStyle: "#ff0000",
+                strokeWidth: 1,
+                fillStyle: "#ffffff",
+                cx: xs + (dwc - 1) * dwl + (l - (xs + (dwc - 1) * dwl)) / 2,
+                cy: dwfls + dwh / 2 + i * dwh,
+                width: l - ((dwc - 1) * dwl + xs),
+                height: dwh,
+                layer: "dw",
+              });
+            }
+          }
+        }
         /*
         drawJS.drawRect({
           cx: 100,
@@ -248,11 +398,13 @@
         var wrapper = drawJS.addStage({
           wrapper: "#wrapper",
         });
-        drawJS.addLayer({ id: "back" });
+        drawJS.addLayer({ id: "dw" });
         drawJS.addLayer({ id: "front" });
 
         var startDragOffset = {};
         var mouseDown = false;
+
+        document.getElementById("wrapper").classList.add("hidden");
 
         document.getElementById("draw").addEventListener(
           "click",
@@ -262,20 +414,14 @@
             h = parseInt(document.querySelector("input[name=h]").value);
             fls = parseInt(document.querySelector("input[name=fls]").value);
             s = parseInt(document.querySelector("input[name=s]").value);
-            mfls = parseInt(
-              document.querySelector("input[name=mfls]").value
-            );
+            mfls = parseInt(document.querySelector("input[name=mfls]").value);
             ms = parseInt(document.querySelector("input[name=ms]").value);
-            bfls = parseInt(
-              document.querySelector("input[name=bfls]").value
-            );
+            bfls = parseInt(document.querySelector("input[name=bfls]").value);
             bs = parseInt(document.querySelector("input[name=bs]").value);
             mindwfls = parseInt(
               document.querySelector("input[name=mindwfls]").value
             );
-            dwfs = parseInt(
-              document.querySelector("input[name=dwfs]").value
-            );
+            dwfs = parseInt(document.querySelector("input[name=dwfs]").value);
             cdl = parseInt(document.querySelector("input[name=cdl]").value);
             udl = parseInt(document.querySelector("input[name=udl]").value);
             dwl = parseInt(document.querySelector("input[name=dwl]").value);

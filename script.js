@@ -5,8 +5,6 @@ let drawJS = {};
   pen.scaleMultiplier = 0.8;
 
   pen.settings = {
-    stageHeight: 400,
-    stageWidth: 400,
     lineWidth: 1,
     strokeStyle: "000",
     layers: [],
@@ -17,7 +15,7 @@ let drawJS = {};
     //stage.id = o.id || 'stage-' + document.querySelectorAll('.stage').length;;
     let el =
       document.querySelector(o.wrapper) || document.querySelector("body");
-
+console.log(el);
     stage.className = "stage";
 
     let height = o.width || el.offsetHeight || this.settings.stageHeight;
