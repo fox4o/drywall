@@ -1,6 +1,6 @@
 let drawJS = {};
 (function (pen) {
-  pen.translatePos = { x: 0, y: 0 };
+  pen.translatePos = { x: 10, y: 10 };
   pen.scale = 1.0;
   pen.scaleMultiplier = 0.8;
 
@@ -15,7 +15,6 @@ let drawJS = {};
     //stage.id = o.id || 'stage-' + document.querySelectorAll('.stage').length;;
     let el =
       document.querySelector(o.wrapper) || document.querySelector("body");
-console.log(el);
     stage.className = "stage";
 
     let height = o.width || el.offsetHeight || this.settings.stageHeight;
