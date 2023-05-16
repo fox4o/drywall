@@ -230,7 +230,7 @@
         dwn = Math.ceil((l * h) / (dwl * dwh));
         calcData.dw = dwn + " броя плоскости " + dwl + "x" + dwh + "см";
 
-        console.log(calcData);
+        //console.log(calcData);
 
         // drywall
         {
@@ -465,14 +465,6 @@
         });
 
         wrapper.addEventListener("pointerup", function (evt) {
-          mouseDown = false;
-        });
-
-        wrapper.addEventListener("pointerover", function (evt) {
-          mouseDown = false;
-        });
-
-        wrapper.addEventListener("pointerout", function (evt) {
           mouseDown = false;
         });
 
